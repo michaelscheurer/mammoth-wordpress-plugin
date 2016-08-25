@@ -62,6 +62,28 @@ function setUpMammoth() {
                         binary: imageBinaryString
                     });
                 }).then(function(uploadResult) {
+                    if (element.altText) {
+                        return jQuery.ajax({
+                            url: "/wp-admin/admin-ajax.php",
+                            type: "POST",
+                            data: {
+                                "action": "save-attachment",
+                                "changes[alt]": element.altText,
+                                "id": uploadResult.data.id,
+                                "post_id": 0,
+                                "nonce": uploadResult.data.nonces.update
+                            }
+                        }).then(
+                            function() {
+                                return uploadResult;
+                            }, function() {
+                                return uploadResult;
+                            }
+                        );
+                    } else {
+                        return uploadResult;
+                    }
+                }).then(function(uploadResult) {
                     return {
                         src: uploadResult.data.url,
                         "class": "wp-image-" + uploadResult.data.id
