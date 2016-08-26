@@ -63,27 +63,12 @@ function setUpMammoth() {
                     });
                 }).then(function(uploadResult) {
                     if (element.altText) {
-                        return jQuery.ajax({
-                            url: "/wp-admin/admin-ajax.php",
-                            type: "POST",
-                            data: {
-                                "action": "save-attachment",
-                                "changes[alt]": element.altText,
-                                "id": uploadResult.data.id,
-                                "post_id": 0,
-                                "nonce": uploadResult.data.nonces.update
-                            }
-                        }).then(
-                            function() {
-                                return uploadResult;
-                            }, function() {
-                                return uploadResult;
-                            }
-                        );
-                    } else {
-                        return uploadResult;
+                        setImageAltText({
+                            id: uploadResult.data.id,
+                            alt: element.altText,
+                            nonce: uploadResult.data.nonces.update
+                        });
                     }
-                }).then(function(uploadResult) {
                     return {
                         src: uploadResult.data.url,
                         "class": "wp-image-" + uploadResult.data.id
@@ -129,7 +114,21 @@ function setUpMammoth() {
             return deferred.promise();
         });
     }
-    
+
+    function setImageAltText(options) {
+        return jQuery.ajax({
+            url: "/wp-admin/admin-ajax.php",
+            type: "POST",
+            data: {
+                "action": "save-attachment",
+                "changes[alt]": options.alt,
+                "id": options.id,
+                "post_id": 0,
+                "nonce": options.nonce
+            }
+        })
+    }
+
     function insertTextIntoEditor(text) {
         var elementId = "content";
         // The ckeditor-for-wordpress plugin shims tinyMCE in such a way
